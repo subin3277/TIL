@@ -4,7 +4,8 @@
 
 
 ### 🍀 Python
-- [코드 작성법](https://github.com/subin3277/TIL/blob/main/Python/%EC%BD%94%EB%93%9C%20%EC%9E%91%EC%84%B1%EB%B2%95.md)
+- [코드 작성법](https://github.com/subin3277/TIL/blob/main/Python/기초문법/코드작성법.md)
+- [변수 & 연산자](https://github.com/subin3277/TIL/blob/main/Python/기초문법/변수.md)
 
 
 ### 🍀 ECT
