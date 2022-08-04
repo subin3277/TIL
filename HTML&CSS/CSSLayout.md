@@ -23,3 +23,34 @@
         * align-content : cross axis를 기준으로 공간 배분, 아이템이 한 줄로 배치되는 경우 확인 할 수 없음. (flex-start, flex-end, center, space-between, space-around, space-evenly)
     * 정렬
         * align-items : 모든 아이템을 cross axis 기준으로 정렬(stretch, flex-start, flex-end, center, baseline), align-self(개별 아이템)
+    * 기타
+        * flex-grow : 남은 영역을 아이템에 분배
+        * order : 배치순서
+
+---
+## Bootstrap
+* spaceing(Margin and padding) : `{property}{sides}-{size}`
+    * property 
+        * m : margin 값 설정
+        * p : padding 값 설정
+    * sides
+        * t : top 값 설정
+        * b : bottom 값 설정
+        * s : start(left) 값 설정
+        * e : end(right) 값 설정
+        * x : left, right 값 설정
+        * y : top, bottom 값 설정
+        * blank : 4 부분 값 설정
+    * size
+        * auto : 자동으로 설정
+        * 0 : 0 으로 설정
+        * 1 : $spacer * 0.25 = 0.25 rem = 4px
+        * 2 : $spacer * 0.5 = 0.5 rem = 8px
+        * 3 : $spacer = 1 rem = 16px
+        * 4 : $spacer * 1.5 
+        * 5 : $spacer * 3
+    ```
+    `mx-autoa` : 수평 중앙 정렬, 가로 가운데 정렬!
+    `py-0` : 위 아래 padding 0
+    ```
+* color
