@@ -28,6 +28,27 @@ CREATE TABLE table_name (
 ## 데이터 타입
 * NULL : NULL value, 정보가 없거나 알 수 없음을 의미
 * INTEGER : 정수, 크기에 따라 0, 1, 2, 3, 4, 6, 8 바이트와 같은 가변 크기를 가짐
-* REAL : 
-* TEXT
-* BLOB
+* REAL : 실수, 8바이트 부동 소수점을 사용하는 10진수 값이 있는 실수
+* TEXT : 문자 데이터
+* BLOB : 입력된 그대로 저장도니 데이터 덩어리. 바이너리 등 멀티미디어 파일. 이미지 데이터 등...
+* Boolena type은 없음
+
+## Constraints 종류
+* NOT NULL : 컬럼이 NULL 값을 허용하지 않도록 지정, 기본적으로 테이블의 모든 컬럼은 NOT NULL 제약조건을 명시적으로 사용하는 경우를 제외하고는 NULL 값을 허용함
+* UNIQUE : 컬럼의 모든 값이 서로 구별되거나 고유한 값이 되도록 함
+* PRIMARY KEY : 테이블에서 행의 고유성을 식별하는 데 사용되는 컬럼. 각 테이블에는 하나의 기본 키만 있음. 암시적으로 NOT NULL 제약 조건이 포함되어있음
+* AUTOINCREMENT : 사용되지 않은 값이나 이전에 삭제된 행의 값을 재사용하는 것을 방지. INTEGER PRIMARY KEY 다음에 작성하면 해당 rowid를 다시 재사용하지 못하도록 함.
+
+## ALTER TABLE
+* rename a table
+`ALTER TABLE table_name RENAME TO new_table_name;`
+* rename a column
+`ALTER TABLE table_name RENAME COLUMN column_name TO new_column_name;`
+* add a new column to a table
+`ALTER TABLE table_name ADD COLUMN column_definition;`
+* delete a column
+`ALTER TABLE table_name DROP COLUMN cloumn_name;`
+
+## DROP TABLE
+* remove a table
+`DROP TABLE table_name;`
