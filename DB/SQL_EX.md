@@ -236,33 +236,172 @@
     `select job, count(*) from emp where job != 'SALESMAN' group by job having count(*) >= 3`
 - ex41
   - 직업이 analyst, manager인 사원들의 이름, 직업, 월급, 월급에 대한 순위 출력
-  `select ename, job, sal, rank() over (order by sal desc) 순위 from emp where job in ('ANALYST', 'MANAGER')`
+    `select ename, job, sal, rank() over (order by sal desc) 순위 from emp where job in ('ANALYST', 'MANAGER')`
   - 부서번호가 20인 사원들의 이름과 부서번호와 월급과 월급에 대한 순위 출력
-  `select ename, deptno, sal, rank() over (order by sal desc) 순위 from emp where deptno = 20`
+    `select ename, deptno, sal, rank() over (order by sal desc) 순위 from emp where deptno = 20`
 - ex42
   - 이름과 직업과 월급과 순위를 출력하는데 그 옆에 순위가 동일한 사람이 여러명인 경우 바로 다음 순위가 출력
-  `select ename, job, sal, dense_rank() over (order by sal desc) 순위 from emp where job in ('ANALYST', 'MANAGER')`
+    `select ename, job, sal, dense_rank() over (order by sal desc) 순위 from emp where job in ('ANALYST', 'MANAGER')`
   - 직업, 이름, 월급, 순위를 출력하는데 순위가 직업별로 각각 월급이 높은 사원 순으로 순위 출력
-  `select job, ename, sal, dense_rank() over (partition by job order by sal desc) 순위 from emp`
+    `select job, ename, sal, dense_rank() over (partition by job order by sal desc) 순위 from emp`
   - 월급이 2975인 사원은 사원 테이블에서 월급의 순위 출력
-  `select dense_rank(2975) within group (order by sal desc) 순위 from emp`
+    `select dense_rank(2975) within group (order by sal desc) 순위 from emp`
 - ex43
   - 직업이 analyst, manager, clerk인 사원들의 이름과 직업과 월급과 등급을 출력하는데 등급을 4등급으로 나눠서 출력
-  `select ename, job, sal, ntile(4) over (order by sal desc) 등급 from emp where job in ('ANALYST', 'MANAGER', 'CLERK')`
+    `select ename, job, sal, ntile(4) over (order by sal desc) 등급 from emp where job in ('ANALYST', 'MANAGER', 'CLERK')`
   - 이름, 입사일, 입사한 사원순으로 등급을 나누는데 등급을 5등급으로 나눠서 출력
-  `select ename, hiredate, ntile(5) over (order by hiredate asc) 등급 from emp`
+    `select ename, hiredate, ntile(5) over (order by hiredate asc) 등급 from emp`
 - ex44
   - 이름과 월급과 순위와 자신의 월급의 순위에 대한 비율을 출력
-  `select ename, sal, rank() over (order by sal desc), dense_rank() over (order by sal desc), cume_dist() over (order by sal desc) 비율 from emp`
+    `select ename, sal, rank() over (order by sal desc), dense_rank() over (order by sal desc), cume_dist() over (order by sal desc) 비율 from emp`
   - 부서번호, 이름과 월급과 월급의 순위에 대한 비율 출력. 순위 비율이 부서번호별로 각각 출력
-  `select deptno, ename, sal, cume_dist() over (partition by deptno order by sal desc) 순위 from emp`
+    `select deptno, ename, sal, cume_dist() over (partition by deptno order by sal desc) 순위 from emp`
 - ex45
   - 부서번호를 출력하고, 해당 부서번호별로 속한 사원들의 이름을 가로로 출력
-  `select deptno, listagg(ename, ',') within group (order by ename asc) as 이름 from emp group by deptno `
+    `select deptno, listagg(ename, ',') within group (order by ename asc) as 이름 from emp group by deptno `
   - 직업, 직업별로 속한 사원들의 이름을 가로로 출력하는데 가로로 출력될 때에 월급이 높은 사원부터 출력
-  `select job, listagg(ename, ',') within group (order by sal desc) as 이름 from emp group by job `
+    `select job, listagg(ename, ',') within group (order by sal desc) as 이름 from emp group by job `
 - ex46
   - 직업이 analyst, manager인 사원들의 사원번호화 이름과 월급을 출력하는데 다음과 같이 월급의 그 전행과 그 다음행이 출력
-  `select empno, ename, sal, lag(sal, 1) over (order by sal asc) 전행, lead(sal, 1) over (order by sal asc) 다음행 from emp where job in ('ANALYST', 'MANAGER')`
+    `select empno, ename, sal, lag(sal, 1) over (order by sal asc) 전행, lead(sal, 1) over (order by sal asc) 다음행 from emp where job in ('ANALYST', 'MANAGER')`
   - 이름, 입사일, 바로 전에 입사한 사원과의 간격일을 출력
-  `select ename, hiredate, hiredate - lag(hiredate, 1) over (order by hiredate asc) 간격일 from emp`
+    `select ename, hiredate, hiredate - lag(hiredate, 1) over (order by hiredate asc) 간격일 from emp`
+- ex47
+  - 부서번호와 부서번호별 토탈 월급을 가로로 출력
+    `select sum(decode(deptno, 10, sal, null)) as "10", sum(decode(deptno, 20, sal, null)) as "20", sum(decode(deptno, 30, sal, null)) as "30" from emp`
+  - 직업, 직업별 토탈월급을 가로로 출력
+    `select sum(decode(job, 'ANALYST', sal)) as "ANALYST",
+  sum(decode(job, 'CLERK', sal)) as "CLERK",
+  sum(decode(job, 'SALESMAN', sal)) as "SALESMAN",
+  sum(decode(job, 'MANAGER', sal)) as "MANAGER",
+  sum(decode(job, 'PRESIDENT', sal)) as "PRESIDENT"                
+  from emp`
+- ex48
+  - 부서번호, 부서번호별 토탈 월급을 가로로 출력
+    `select * from (select deptno, sal from emp) pivot ( sum(sal) for deptno in (10, 20, 30))`
+  - 직업, 직업별 토탈월급을 가로로 출력
+    `select * from (select job, sal from emp) pivot ( sum(sal) for job in ('ANALYST', 'CLERK', 'SALESMAN', 'MANAGER', 'PRESIDENT'))`
+- ex49
+  - 컬럼이 데이터로 들어가게
+    `select * from order2 unpivot ( 건수 for 아이템 in (BICYCLE, CAMERA, NOTEBOOK))`
+  - 범죄원인 테이블을 생성하고 방화사건의 가장 큰 원인이 무엇인지 출력
+    `select * from crime_cause unpivot (건수 for 원인 in (생계형, 유흥, 도박, 허영심, 복수, 해고, 징벌, 가정불화, 호기심, 유혹, 사고, 불만, 부주의, 기타)) where crime_type='방화' order by 건수 desc`
+- ex50
+  - 직업이 analyst, manager인 사원들의 사원번호, 사원이름, 월급, 월급에 대한 누적치를 출력
+    `select empno, ename, sal, sum(sal) over (order by empno rows between unbounded preceding and current row) 누적치 from emp where job in ('ANALYST', 'MANAGER')`
+  - 부서번호가 20번인 사원들의 사원이름, 월급, 월급에 대한 누적치 출력
+    `select ename, sal, sum(sal) over (order by empno rows between unbounded preceding and current row) 누적치 from emp where deptno=20`
+- ex51
+  - 부서번호가 20번인 사원들의 사원번호, 이름, 월급, 월급에 대한 비율 출력
+    `select empno, ename, sal, round(ratio_to_report(sal) over (), 2) 비율 from emp where deptno=20`
+  - 사원 테이블 전체에서 사원번호, 이름, 월급, 월급에 대한 비율 출력
+    `select empno, ename, sal, round(ratio_to_report(sal) over (), 2) 비율 from emp`
+- ex52
+  - 직업, 직업별 토탈월급을 출력하는데 맨 아래에 전체 토탈월급이 출력
+    `select job, sum(sal) from emp group by rollup(job)`
+  - 부서번호, 부서번호별 토탈 월급을 출력하는데 맨 아래에 전체 토탈월급이 출력
+    `select deptno, sum(sal) from emp group by rollup(deptno)`
+- ex53
+  - 직업, 직업별 토탈월급을 출력하는데 맨 위에 토탈월급이 출력
+    `select job, sum(sal) from emp group by cube(job)`
+  - 입사한 년도, 년도별 토탈 월급을 출력하는데 맨위에 사원 테이블의 전체 토탈월급 출력
+    `select to_char(hiredate, 'RRRR'), sum(sal) from emp group by cube(to_char(hiredate, 'RRRR'))`
+- ex54
+  - 직업별 토탈 월급과 부서번호별 토탈월급과 전체 토탈월급을 같이 출력
+    `select deptno, job, sum(sal) from emp group by grouping sets ( deptno, job, () )`
+  - 입사한 년도별 토탈월급과 직업별 토탈월급을 같이 출력
+    `select to_char(hiredate, 'RRRR'), job, sum(sal) from emp group by grouping sets ((to_char(hiredate, 'RRRR')), (job))`
+- ex55
+  - 부서번호가 20인 사원들의 사원번호, 사원이름, 월급, 순위를 출력하는 결과 끝에 번호를 넘버링해서 출력
+    `select empno, ename, sal, rank() over (order by sal desc) as rank, dense_rank() over (order by sal desc) as dense_rank, row_number() over (order by sal desc) as row_num from emp`
+  - 월급이 1000에서 3000 사이인 사원들의 이름과 월급을 출력하는데 출력하는 결과 맨 끝에 번호를 넘버링
+    `select ename, sal, row_number() over (order by empno asc) as 번호 from emp where sal between 1000 and 3000`
+- ex56
+  - 사원 테이블에서 맨 위의 5개 행만 출력
+    `select rownum, empno, ename, job, sal from emp where rownum <= 5`
+  - 직업이 salesman인 사원들의 이름과 월급과 직업을 출력하는데 맨위의 행 2개만 출력
+    `select ename, sal, job from emp where job='SALESMAN' and rownum <= 2`
+- ex57
+  - 월급이 높은 사원순으로 사원번호, 이름, 직업, 월급을 출력하는데 맨위의 행 4개만 출력
+    `select empno, ename, sal, job from emp order by sal desc fetch first 4 rows only`
+  - 최근에 입사한 사원순으로 이름, 입사일과 월급을 출력하는데 맨위의 행 5개만 출력
+    `select ename, hiredate, sal from emp order by hiredate desc fetch first 5 rows only`
+- ex58
+  - 사원테이블과 부서테이블을 조인해서 이름과 부서위치를 출력
+    `select e.ename, d.loc from emp e , dept d where e.deptno = d.deptno`
+  - 직업이 salesman인 사원들의 이름과 직업과 부서위치를 출력
+    `select e.ename, e.job, d.loc from emp e, dept d where e.deptno = d.deptno and e.job='SALESMAN'`
+  - dallas에서 근무하는 사원들의 이름과 월급과 부서위치를 출력
+    `select e.ename, e.sal, d.loc from emp e, dept d where e.deptno = d.deptno and d.loc='DALLAS'`
+- ex59
+  - 사원테이블과 급여 테이블과 조인하여 이름과 월급과 월급에 대한 등급을 출력
+    `select e.ename, e.sal, s.grade from emp e, salgrade s where e.sal between s.losal and s.hisal`
+  - 급여등급이 4등급인 사원들의 이름과 월급을 출력하는데 월급이 높은 사원부터 출력
+    `select e.ename, e.sal, s.grade from emp e, salgrade s where s.grade=4 and e.sal between s.losal and s.hisal order by e.sal desc`
+- ex60
+  - 이름과 부서위치를 출력하는데 boston도 출력
+    `select e.ename, d.loc from emp e, dept d where e.deptno (+) = d.deptno`
+  - 사원테이블 전체에 이름과 부서위치를 출력하는데 jack도 출력
+    `select e.ename, d.loc from emp e, dept d where e.deptno = d.deptno (+)`
+- ex61
+  - 직업이 salesman인 사원들의 사원이름과 직업을 출력하고 관리자 이름과 관리자의 직업 출력
+    `select 사원.ename as 사원, 사원.job as 직업, 관리자.ename as 관리자, 관리자.job as 직업 from emp 사원, emp 관리자 where 사원.mgr = 관리자.empno`
+  - 위 결과를 출력하는데 관리자인 사원들보다 더 많은 월급을 받는 사원들의 데이터만 출력
+    `select 사원.ename as 사원, 사원.job as 직업, 관리자.ename as 관리자, 관리자.job as 직업 from emp 사원, emp 관리자 where 사원.mgr = 관리자.empno and 사원.sal > 관리자.sal`
+- ex62
+  - on 절을 사용한 조인문법으로 결과 출력
+  `select e.ename, e.sal, e.job, d.loc from emp e join dept d on ( e.deptno = d.deptno ) where e.job='SALESMAN'`
+  - 월급이 1000에서 3000인 사이인 사원들의 이름과 월급과 부서위치를 on절을 사용한 조인문법으로 출력
+  `select e.ename, e.sal, d.loc from emp e join dept d on (e.deptno = d.deptno) where e.sal between 1000 and 3000`
+- ex63
+  - using 절을 사용한 조인문법으로 결과 출력
+  `select e.ename, e.job, e.sal, d.loc from emp e join dept d using (deptno)`
+  - using 절을 사용한 조인문법으로 부서위치가 dallas인 사원들의 이름과 월급과 부서위치 출력
+  `select e.ename, e.sal, d.loc from emp e join dept d using (deptno) where d.loc = 'DALLAS'`
+- ex64
+  - natural join으로 결과 출력
+  `select e.ename, e.job, e.sal, d.loc from emp e natural join dept d`
+  - 직업이 salesmand이고 부서번호가 30번인 사원들의 이름과 직업과 월급과 부서위치 출력
+  `select e.ename, e.job, e.sal, d.loc from emp e natural join dept d where e.job='SALESMAN' and deptno=30`
+- ex65
+  - 1999 ansi 조인문법의 outer join으로 결과 출력
+  `select e.ename, e.job, e.sal, d.loc from emp e right outer join dept d on (e.deptno = d.deptno)`
+  - 1999 ansi 조인문법을 사용하여 이름과 직업, 월급과 부서위치를 출력하는데 사원 테이블에 jack도 출력
+  `select e.ename, e.job, e.sal, d.loc from emp e left outer join dept d on (e.deptno = d.deptno)`
+- ex66
+  - 다음과 같이 jack도 출력되고 부서위치의 boston도 출력
+  `select e.ename, e.job, e.sal, d.loc from emp e full outer join dept d on (e.deptno = d.deptno)`
+  - 직업이 ANALYST 이거나 부서위치가 BOSTON인 사원들의 이름과 직업과 월급과 부서위치를 출력하는데 full outer 조인을 사용
+  `select e.ename, e.job, e.sal, d.loc from emp e full outer join dept d on (e.deptno = d.deptno) where e.job='ANALYST' or d.loc='BOSTON'`
+- ex67
+  - 부서번호와 부서번호별 토탈 월급을 출력하는데 맨아래 전체 토탈 월급도 출력
+  `select deptno, sum(sal) from emp group by deptno union all select null, sum(sal) from emp`
+  - 직업과 직업별 토탈월급을 출력하는데 맨 아래에 전체 토탈월급도 출력
+  `select job, sum(sal) from emp group by job union all select to_char(null) as job, sum(sal) from emp order by job asc`
+- ex68
+  - 부서번호와 부서번호별 토탈 월급을 출력하고 맨 아래에 전체 토탈월급도 출력하는데 부서번호가 오름차순으로 정렬
+  `select deptno, sum(sal) from emp group by deptno union select to_number(null) as deptno, sum(sal) from emp`
+  - 직업, 직업별 토탈월급을 출력하는데 직업이 abcd 순으로 정렬되어서 출력하고 맨 아래에 전체 토탈월급을 출력
+  `select job, sum(sal) from emp group by job union select to_char(null) as job, sum(sal) from emp`
+  - 입사한 년도, 입사한 년도별 토탈월급을 출력하는데 맨 아래에 전체 토탈월급이 출력
+  `select to_char(hiredate, 'RRRR'), sum(sal) from emp group by to_char(hiredate, 'RRRR') union select to_char(null) as job, sum(sal) from emp`
+- ex69
+  - 집합 연산자로 데이터의 교집합 출력
+  `select ename, sal, job, deptno from emp where deptno in (10, 20) intersect select ename, sal, job, deptno from emp where deptno in (20, 30)`
+  - 사원 테이블과 부서 테이블과의 공통된 부서번호 출력
+  `select deptno from emp intersect select deptno from dept`
+- ex70
+  - 집합 연산자로 데이터의 차이 출력
+  `select ename, sal, job, deptno from emp where deptno in (10, 20) minus select ename, sal, job, deptno from emp where deptno in (20, 30)`
+  - 부서테이블에는 존재하는데 사원 테이블에는 존재하지 않는 부서번호 출력
+  `select deptno from emp minus select deptno from dept`
+- ex71
+  - jones보다 더 많은 월급을 받는 사원들의 이름과 월급 출력
+  `select ename, sal from emp where sal > (select sal from emp where ename='JONES')`
+  - allen보다 더 늦게 입사한 사원들의 이름과 월급 출력
+  `select ename, sal from emp where hiredate > (select hiredate from emp where ename='ALLEN')`
+- ex72
+  - 직업이 salesman인 사원들과 같은 월급을 받는 사원들의 이름과 월급 출력
+  `select ename, sal from emp where sal in (select sal from emp where job='SALESMAN')`
+  - 부서번호가 20번인 사원들과 같은 직업을 갖는 사원들의 이름과 직업 출력
+  `select ename, sal from emp where job in (select job from emp where deptno=20)`
