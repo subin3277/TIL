@@ -511,3 +511,99 @@ from emp`
     `create global temporary table emp37 ( empno number(10), ename varchar2(10), sal number(10)) on commit delete rows;`
   - 세션을 종료하면 데이터가 사라지는 임시테이블을 다음과 같이 생성
     `create global temporary table emp94 ( empno number(10), ename varchar2(10), sal number(10) on commit preserve rows) `
+- ex95_view
+  - 사원 테이블에서 직업이 slaesman인 사원들의 사원번호, 사원이름, 직업, 관리자 번호, 부서번호만 바라볼 수 있는 view 생성
+    `create view emp_view as select empno, ename, job, sal, deptno from emp where job = 'SALESMAN';`
+  - 사원테이블에서 부서번호가 20번인 사원들의 사원번호와 사원이름, 직업, 월급을 볼 수 있는 view 생성
+    `create view emp_view as select empno, ename, job, sal from emp where deptno=20;`
+- ex96
+  - 사원테이블에서 부서번호와 부서번호별 평균 월급만 바라볼 수 있는 view
+    `create view emp_view2 as select deptno, round(avg(sal)) as avgsal from emp group by deptno; `
+  - 직업, 직업별 토탈월급을 출력하는 view 생성
+    `create view emp_view as select job, sum(job) as sumsal from emp group by job`
+- ex97_index
+  - 월급이 3000인 사원의 이름과 월급을 인덱스를 통해서 빠르게 검색
+    `explain plan for select ename, sal from emp where sal = 3000;`
+  - 사원 테이블에 직업에 인덱스 생성
+    `create index emp_job on emp(job)`
+- ex98_sequence
+  - 사원번호에 번호를 입력할때 데이터가 중복되지 않고 순서대로 입력되게
+    `create sequence seq2 start with 1 maxvalue 100 increment by 1 nocycle`
+  - dept 테이블에 부서번호를 50번부터 입력하고 10씩 증가되는 시퀀스
+    `create sequence dept_seq1 start with 50 increment by 10`
+- ex99_flashback query
+  - 사원 테이블을 지우기전인 5분전인 사원 테이블의 상태를 검색
+    `select * from emp as of timestamp(systimestamp - interval '5' minute)`
+  - 사원 테이블의 월급을 모두 0으로 변경하고 commit 한 후에 사원테이블을 1분전 상태로 되돌리시오
+    `merge into emp e using (select empno, sal from emp as of timestamp(systimestamp - interval '1' minute)) s on (e.empno = s.empno) when matched then update set e.sal = s.sal;`
+- ex100_flashback table
+  - 사원 테이블을 지우기전 5분 전의 상태로 되돌리세요
+    `flashback table emp to timestamp(systimestamp - interval '5' minute)`
+  - 사원 테이블의 월급을 전부 0으로 변경하고 commit 한 다음에 사원 테이블의 월급을 전부 0으로 변경하기 전 상황으로 복구
+    `flashback table emp to timestamp(systimestamp - interval '5' minute)`
+- ex101_flashback drop
+  - drop한 테이블 살리기
+    `flashback table emp to before drop;`
+  - dept 테이블을 drop하고 다시 복구하세요
+    `flashback table dept to before drop;`
+- ex102_flashback version query
+  - 그동안 emp 테이블이 어떻게 변해왔는지 확인하고 싶다면
+    `select ename, sal, deptno, versions_starttime, versions_endtime, versions_operation from emp versions between to_timestamp('21/08/11 13:21:10', 'RRRR-MM-DD HH24:MI:SS') and maxvalue where ename='KING' order by versions_starttime nulls first`
+  - 부서 테이블의 부서위치를 전부 seoul로 변경하고 dept 테이블이 그동안 어떻게 변경되어왔는지 확인
+    `select deptno, dname, loc, versions_starttime, versions_endtime, versions_operation from dept versions between to_timestamp('21/08/11 13:21:10', 'RRRR-MM-DD HH24:MI:SS') and maxvalue order by versions_starttime nulls first`
+- ex103_flashback transaction query
+  - 실수로 데이터를 지워서 다시 복구할 수 있는 스크립트를 구할 수 있다면?
+- ex104_primary key
+  - 사원번호에 중복된 데이터와 null 값을 입력 안되게 하려면
+    `create table dept2 ( deptno number(10) constraint dept2_deptno_pk primary key, dname varchar(10), loc varchar2(10))` or `alter table dept add constraint dept_deptno_pk primary key(deptno)`
+  - 사원 테이블의 empno에 primary key 생성
+    `alter table emp add constraint emp_empno_pk primary key(empno)`
+- ex105_unique
+  - 사원번호에 중복된 데이터가 입력안되게 하려면
+    `create table dept3 (deptno number(10), dname varchar(14) constraint dept3_dname_un unique, loc varchar2(10));` or `alter table dept4 add constraint dept4_dname_un unique(dname)`
+  - 사원번호, 사원이름 ,월급, 직업을 담는 테이블을 아래와 같이 생성하는데 사원번호 컬럼에 중복된 데이터가 입력되지 않도록 제약을 걸어서 생성
+    `create table emp1000 (empno number(10) constraint emp100_empno_un unique, ename varchar2(10), sal number(10), job varchar2(10))`
+  - 사원 테이블에 사원번호에 중복된 데이터가 있는지 검색
+    `select empno, count(*) from emp group by empno having count(*) >= 2`
+  - 사원 테이블에 사원번호에 중복된 데이터가 입력되지 못하도록 제약
+    `alter table emp add constraint emp_empno_un unique(empno)`
+- ex106_not null
+  - 사원 이름에 null이 입력 안되게 하려면
+    `create table dept5 (deptno number(10), dname varchar(14), loc varchar2(10) constraint dept5_loc_nn not null)` or `alter table dept5 modify loc constraint dept5_loc_nn not null`
+  - 사원 테이블에 사원이름에 null 값이 몇건 존재하는지 검색
+    `select count(*) from emp where ename is null`
+  - 사원 테이블에 사원이름에 not null 제약을 거세요
+    `alter table emp modify ename constraint emp_ename_nn not null`
+  - 부서 테이블에 부서번호에 not null 제약을 거세요
+    `alter table dept modify deptno constraint dept_deptno_nn not null`
+- ex107_check
+  - 월급 컬럼에 9000보다 큰 월급은 입력되지 못하게 하려면
+    `create table emp6 (empno number(10), ename varchar2(20), sal number(10) constraint emp6_sal_ck check (sal between 0 and 9000))` or `alter table emp add constraint emp_sal_ck check(sal between 0 and 9000)`
+  - 제약 삭제
+    `alter table emp6 drop constraint emp6_sal_ck`
+  - 사원 테이블의 부서번호에 부서번호가 10, 20, 30번만 입력 제약
+    `alter table emp add constraint emp_deptno_ck check(deptno in (10, 20, 30))`
+  - 부서 테이블의 부서위치에 new york, dallas, chicago, boston만 입력 수정
+    `alter table dept add constraint dept_loc_ck check(loc in ('NEW YORK', 'DALLAS', 'CHICAGO', 'BOSTON'))`
+  - 사원 테이블에 이메일 컬럼을 다음과 같이 추가하고 이메일에 @가 있어야지만 데이터가 입력 수정
+    `alter table emp add constraint emp_email_ck check(email like '%@%')`
+- ex108_foreign key
+  - 부서 테이블에 있는 부서번호만 사원 테이블에 입력
+    - `create table dept7 (deptno number(10) constraint dept7_deptno_pk primary key, dname varchar(14), loc varchar2(10))`
+    - `create table emp7 (empno number(10), ename varchar2(20), sal number(10), deptno number(10) constraint emp7_deptno_fk references dept7(deptno))`
+    - `alter table dept7 add constraint dept7_deptno_pk cascade;`
+  - 사원 테이블에 empno 에 primary key 설정
+    `alter table emp add constraint emp_empno_pk primary key(empno)`
+  - 사원 테이블에 관리자번호에 forein key 제약을 걸고 사원 테이블에 있는 컬럼을 참조하게 하여 관리자 번호가 사원 테이블에 있는 사원번호에 해당하는 사원들만 관리자 번호로 입력 또는 수정
+    `alter table emp add constraint emp_empno_fk foreign key(mgr) references emp(empno)`
+- ex109_with as
+  - 시간이 오래걸리는 무거운 쿼리문이 하나의 쿼리문에서 반복 사용된다면
+    `with job_sumsal as (select job, sum(sal) as 토탈 from emp group by job) select job, 토탈 from job_sumsal where 토탈 > (select avg(토탈) from job_sumsal)`
+  - 부서번호별 토탈월급을 출력하는데 부서번호별 토탈월급들의 평균값보다 더 큰것만 출력
+    `with job_sumsal as (select job, sum(sal) as 토탈 from emp group by job) select job, 토탈 from job_sumsal where 토탈 > (select avg(토탈) from job_sumsal)`
+  - 부서위치, 부서위치별 토탈월급을 출력하는데 부서위치별 토탈월급의 평균값보다 더 큰 것만 출력
+    `with loc_sumsal as (select d.loc, sum(e.sal) as 토탈 from emp e join dept d on (e.deptno = d.deptno) group by d.loc) select loc, 토탈 from loc_sumsal where 토탈 > (select avg(토탈) from loc_sumsal)`
+- ex110_subquery factoring
+  - `select deptno, sum(sal) from (select job, sum(sal) 토탈 from emp group by job) as job_sumsal, (select deptno, sum(sal) 토탈 from emp group by deptno having sum(sal) > (select avg(토탈) + 3000 from job_sumsal))` => 불가능
+  - 입사한 년도와 입사한 년도별 토탈 월급을 출력하는데 부서번호별 토탈월급들의 평균값보다 더 큰것만 출력
+    `with deptno_sumsal as (select deptno, sum(sal) 토탈 from emp group by deptno), hire_sumsal as (select to_char(hiredate, 'RRRR') hire_year, sum(sal) 토탈 from emp group by to_char(hiredate, 'RRRR') having sum(sal) > (select avg(토탈) from deptno_sumsal)) select hire_year, 토탈 from hire_sumsal`
