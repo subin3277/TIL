@@ -1,13 +1,21 @@
-# DI & IOC
+# DI & IoC
 
 ### DI (Dependency Injection)
 - 의존 관계 주입 기능
   - 객체를 직접 생성하는 게 아니라 외부에서 생성한 후 주입 시켜주는 방식
   - 모듈 간의 결합도가 낮아지고 유연성이 높아진다 -> 독립성 높아짐
 - 의존성 주입 방법
-  - 외부(IOC 컨테이너)에서 생성된 객체를 setter()를 통해 사용 
+  - 외부(IoC 컨테이너)에서 생성된 객체를 setter()를 통해 사용
+- 용어
+  - 빈 Bean
+    - 스프링이 IoC 방식으로 관리하는 객체
+  - 빈 팩토리 BeanFactory
+    - IoC를 담당하는 핵심 컨테이너
+    - Bean을 등록, 생성, 조회, 반환하는 기능
+  - 어플리케이션 컨텍스트 Application Context
+    - Bean Factory를 확장한 IoC 컨테이너
 
-### IOC(Inversion of Control)
+### IoC(Inversion of Control)
 - 제어의 흐름을 바꾸는 기능
   - 메소드나 객체의 호출 작업을 개발자가 결정하는 것이 아니라, 외부에서 결정되는 것
   - 의존성을 역전시켜서 결합도를 줄이고 유연한 코드를 작성할 수 있도록 하는 것

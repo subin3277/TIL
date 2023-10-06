@@ -32,9 +32,9 @@
   - ASP(Active Server Page) : MS -> IIS에서만 동작
   - JSP(Java Server Page) : Sun Microsystems -> 웹서버 독립적
 - JSP
-- JSP 코드를 포함하는 HTML
-- JSP page는 Web Container에 의해 서블릿 인스턴스로 변환 되며, 변환된 서블릿은 해당 JSP page에 대한 요청을 처리
-- ASP나 PHP는 HTTP 요청이 들어올 때 마다 interpret 되는 반면, JSP는 Java bytecode로 컴파일
+  - JSP 코드를 포함하는 HTML
+  - JSP page는 Web Container에 의해 서블릿 인스턴스로 변환 되며, 변환된 서블릿은 해당 JSP page에 대한 요청을 처리
+  - ASP나 PHP는 HTTP 요청이 들어올 때 마다 interpret 되는 반면, JSP는 Java bytecode로 컴파일
 - JSP 장점
   - OS의 쉘이나 프로세스가 아닌 스레드가 사용되기 때문에 웹 응용프로그램의 성능과 확장성이 있다
   - Java를 기반으로 하기 때문에 Platform independent하다
@@ -43,3 +43,15 @@
   - Presentation logic과 Business logic을 같이 포함하는 경우가 있다
   - 동시성 문제를 고려해야한다
   - 디버깅이 어렵다
+
+### 구조
+- userDAO (Data Access Object) -> Model
+  - JDBC 사용
+  - DB 연동
+- userVO (value Object) -> Model
+  - 값을 웹상에 뿌려주기 위한 객체
+- index.jsp, UserList.jsp -> View
+  - Entry 역할
+- UserListServlet -> Controller
+  - Presentation Layer
+  - init, goGet, destroy : life cycle
